@@ -23,12 +23,15 @@
 %% API Function Definitions
 %% ------------------------------------------------------------------
 
+-spec start_link() -> {ok, pid()} | ignore | {error, _}.
 start_link() ->
     gen_server:start_link(?SERVER, ?MODULE, [], []).
 
+-spec incr(By::integer()) -> ok.
 incr(By) ->
 	gen_server:cast(?SERVER, {incr, By}).
 
+-spec get_count() -> integer().
 get_count() ->
 	gen_server:call(?SERVER, get_count).
 
