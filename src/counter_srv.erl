@@ -21,11 +21,12 @@
 %% API Function Definitions
 %% ------------------------------------------------------------------
 
--spec start_link() -> pid().
+-spec start_link() -> {ok, pid()} | ignore | {error, _}.
+
 start_link() ->
     start_link(0).
 
--spec start_link(StartFrom::integer()) -> pid().
+-spec start_link(StartFrom::integer()) -> {ok, pid()} | ignore | {error, _}.
 start_link(StartFrom) ->
     gen_server:start_link(?MODULE, [StartFrom], []).
 
