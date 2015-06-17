@@ -29,25 +29,27 @@ ok
  {crypto,"CRYPTO","3.4.1"},
  {stdlib,"ERTS  CXC 138 10","2.2"},
  {kernel,"ERTS  CXC 138 10","3.0.3"}]
-4> counter:
-get_count/0    incr/0         incr/1         module_info/0  module_info/1  
-start/0        stop/0         
-4> counter:get_count().
+4> {ok, C1} = counter:new(1000).
+{ok,<0.48.0>}
+5> counter:get_count(C1).
+1000
+6> counter:incr(C1, 555).
+ok
+7> counter:get_count(C1).
+1555
+8> {ok, C2} = counter:new(0).
+{ok,<0.55.0>}
+9> counter:get_count(C2).    
 0
-5> counter:incr().     
+10> counter:incr(C2, -999).   
 ok
-6> counter:incr().
+11> counter:get_count(C2). 
+-999
+12> counter:stop(C1).
 ok
-7> counter:incr().
+13> counter:stop(C2).
 ok
-8> counter:get_count().
-3
-9> counter:incr(-100). 
+14> q().
 ok
-10> counter:get_count().
--97
-11> q().
-ok
-12> $ 
+15> $
 ```
-

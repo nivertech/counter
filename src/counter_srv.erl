@@ -1,15 +1,13 @@
 -module(counter_srv).
 -behaviour(gen_server).
 
--define(SERVER, {global, ?MODULE}).
-
 %% ------------------------------------------------------------------
 %% API Function Exports
 %% ------------------------------------------------------------------
 
--export([start_link/0]).
+-export([start_link/0, start_link/1, stop/1]).
 
--export([incr/1, get_count/0]).
+-export([incr/2, get_count/1]).
 
 
 %% ------------------------------------------------------------------
@@ -23,36 +21,50 @@
 %% API Function Definitions
 %% ------------------------------------------------------------------
 
+-spec start_link() -> pid().
 start_link() ->
-    gen_server:start_link(?SERVER, ?MODULE, [], []).
+    start_link(0).
 
-incr(By) ->
-	gen_server:cast(?SERVER, {incr, By}).
+-spec start_link(StartFrom::integer()) -> pid().
+start_link(StartFrom) ->
+    gen_server:start_link(?MODULE, [StartFrom], []).
 
-get_count() ->
-	gen_server:call(?SERVER, get_count).
+-spec stop(Ref::pid()) -> ok.
+stop(Ref) ->
+    gen_server:cast(Ref, stop).
+
+-spec incr(Ref::pid(), By::integer()) -> ok.
+incr(Ref, By) ->
+	gen_server:cast(Ref, {incr, By}).
+
+-spec get_count(Ref::pid()) -> integer().
+get_count(Ref) ->
+	gen_server:call(Ref, get_count).
 
 
 %% ------------------------------------------------------------------
 %% gen_server Function Definitions
 %% ------------------------------------------------------------------
 
-init([]) ->
-    {ok, 0}.
+init([StartFrom]) ->
+    {ok, StartFrom}.
 
 handle_call(get_count, _From, State) ->
     {reply, State, State};
 handle_call(Request, _From, State) ->
-	io:format("Unexpected request: ~p\n", [Request]),
+	io:format("Unexpected call: ~p\n", [Request]),
     {reply, ok, State}.
 
 handle_cast({incr, By}, State) ->
     {noreply, State+By};
+handle_cast(stop, State) ->
+    {stop, normal, State};
 handle_cast(Msg, State) ->
-	io:format("Unexpected message: ~p\n", [Msg]),
+	io:format("Unexpected cast: ~p\n", [Msg]),
     {noreply, State}.
 
-handle_info(_Info, State) ->
+handle_info(Info, State) ->
+    io:format("Unexpected info: ~p\n", [Info]),
     {noreply, State}.
 
 terminate(_Reason, _State) ->
